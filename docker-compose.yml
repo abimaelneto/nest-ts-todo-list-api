@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  todo-api:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.development
+    depends_on:
+      - db
+    command: npm run start:dev
+  db:
+    container_name: todo_list_db
+    image: postgres
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    env_file:
+      - .env.development
+
+  pgAdmin:
+    container_name: todo_list_pgAdmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - '5050:80'
+    env_file:
+      - .env.development
+    depends_on:
+      - db
