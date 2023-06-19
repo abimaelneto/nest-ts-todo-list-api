@@ -1,5 +1,14 @@
 version: '3.9'
 services:
+  db:
+    container_name: todo_list_db
+    image: postgres
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    env_file:
+      - .env.development
   todo-api:
     build:
       context: .
@@ -15,15 +24,6 @@ services:
     depends_on:
       - db
     command: npm run start:dev
-  db:
-    container_name: todo_list_db
-    image: postgres
-    ports:
-      - '5432:5432'
-    expose:
-      - 5432
-    env_file:
-      - .env.development
 
   pgAdmin:
     container_name: todo_list_pgAdmin

@@ -1,0 +1,29 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
+import { UsersService } from 'src/users/users.service';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
+
+  async signIn(username: string, password: string) {
+    const user = await this.usersService.user({ username });
+    const payload = { sub: `123`, username: username };
+    console.log('JWT', await this.jwtService.signAsync(payload));
+    if (user?.password !== password) {
+      throw new UnauthorizedException("User doesn't exist");
+    }
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+  async register(data: Prisma.UserCreateInput) {
+    return this.usersService.create(data);
+  }
+}

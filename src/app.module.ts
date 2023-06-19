@@ -3,9 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ToDoListsModule } from './to-do-lists/to-do-lists.module';
 import { ToDoItemsModule } from './to-do-items/to-do-items.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [ToDoListsModule, ToDoItemsModule],
+  imports: [ToDoListsModule, ToDoItemsModule, AuthModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })

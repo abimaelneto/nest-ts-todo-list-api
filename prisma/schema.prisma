@@ -11,10 +11,22 @@ datasource db {
 
 }
 
+model User {
+  id    String     @default(uuid()) @id
+  username  String @unique
+  email String
+  password String
+  items ToDoItem[] @relation("UserItems")
+  lists ToDoList[] @relation("UserLists")
+
+}
+
 model ToDoList {
   id    String     @default(uuid()) @id
   title  String
   items ToDoItem[] @relation("ListItems")
+  authorId String?
+  author User? @relation("UserLists", fields:[authorId], references: [id])
 }
 
 model ToDoItem {
@@ -26,4 +38,6 @@ model ToDoItem {
   listId  String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+  authorId String?
+  author User? @relation("UserItems",fields:[authorId], references: [id])
 }
