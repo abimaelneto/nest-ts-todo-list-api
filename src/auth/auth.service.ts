@@ -14,11 +14,10 @@ export class AuthService {
 
   async signIn(username: string, password: string) {
     const user = await this.usersService.user({ username });
-    const payload = { sub: `123`, username: username };
-    console.log('JWT', await this.jwtService.signAsync(payload));
     if (user?.password !== password) {
       throw new UnauthorizedException("User doesn't exist");
     }
+    const payload = { sub: user.id, username: user.username };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
