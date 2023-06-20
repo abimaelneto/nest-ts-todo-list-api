@@ -8,51 +8,70 @@ import {
   Param,
   Patch,
   Post,
-  Res,
+  Req,
 } from '@nestjs/common';
 import { ToDoItemsService } from './to-do-items.service';
-import { Prisma, ToDoList as ToDoItemModel } from '@prisma/client';
+import { ToDoList as ToDoItemModel } from '@prisma/client';
+import { Request } from 'express';
 
 @Controller('items')
 export class ToDoItemsController {
   constructor(private readonly toDoItemsService: ToDoItemsService) {}
   @Get()
-  async getItems(): Promise<ToDoItemModel[]> {
-    return this.toDoItemsService.toDoItems({});
+  async getItems(@Req() req: Request): Promise<ToDoItemModel[]> {
+    const { sub: userId } = req.user;
+    return this.toDoItemsService.toDoItems({ where: { authorId: userId } });
   }
 
   @Get(':id')
-  async getItem(@Param('id') id: string): Promise<ToDoItemModel> {
-    return this.toDoItemsService.toDoItem({ id: id });
+  async getItem(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ): Promise<ToDoItemModel> {
+    const { sub: userId } = req.user;
+
+    return this.toDoItemsService.toDoItem(userId, { id });
   }
 
   @Post('new')
   async createToDoItem(
+    @Req() req: Request,
     @Body() toDoItemData: { title: string; deadline: string; listId: string },
   ): Promise<ToDoItemModel> {
+    const { sub: userId } = req.user;
     const { title, deadline, listId } = toDoItemData;
 
     if (!listId)
       throw new HttpException('Missing list id', HttpStatus.BAD_REQUEST);
 
-    return this.toDoItemsService.createToDoItem({
+    return await this.toDoItemsService.createToDoItem({
       title,
       deadline,
       list: { connect: { id: listId } },
+      author: { connect: { id: userId } },
     });
   }
 
   @Delete(':id')
-  async deleteToDoItem(@Param('id') id: string): Promise<ToDoItemModel> {
-    return this.toDoItemsService.deleteToDoItem({ id });
+  async deleteToDoItem(
+    @Req() req: Request,
+    @Param('id') id: string,
+  ): Promise<ToDoItemModel> {
+    const { sub: userId } = req.user;
+
+    return this.toDoItemsService.deleteToDoItem(userId, { id });
   }
 
   @Patch(':id')
   async update(
+    @Req() req: Request,
+
     @Param('id') id: string,
     @Body() toDoItemData: { deadline: string; listId: string; done: boolean },
   ): Promise<ToDoItemModel> {
-    return this.toDoItemsService.updateToDoItem({
+    const { sub: userId } = req.user;
+
+    return this.toDoItemsService.updateToDoItem(userId, {
       where: { id },
       data: toDoItemData,
     });

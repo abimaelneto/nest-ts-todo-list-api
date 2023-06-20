@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { ToDoItem, Prisma } from '@prisma/client';
 
@@ -7,11 +7,16 @@ export class ToDoItemsService {
   constructor(private prisma: PrismaService) {}
 
   async toDoItem(
-    ToDoItemWhereUniqueInput: Prisma.ToDoItemWhereUniqueInput,
+    userId: string,
+    where: Prisma.ToDoItemWhereUniqueInput,
   ): Promise<ToDoItem | null> {
-    return this.prisma.toDoItem.findUnique({
-      where: ToDoItemWhereUniqueInput,
-    });
+    const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (toDoItem.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do item",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    return toDoItem;
   }
 
   async toDoItems(params: {
@@ -32,26 +37,54 @@ export class ToDoItemsService {
   }
 
   async createToDoItem(data: Prisma.ToDoItemCreateInput): Promise<ToDoItem> {
-    return this.prisma.toDoItem.create({
-      data,
-    });
+    try {
+      return await this.prisma.toDoItem.create({
+        data,
+      });
+    } catch (err) {
+      if (err.code == 'P2025') {
+        throw new HttpException(
+          "Provided list doesn't exist",
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
-  async updateToDoItem(params: {
-    where: Prisma.ToDoItemWhereUniqueInput;
-    data: Prisma.ToDoItemUpdateInput;
-  }): Promise<ToDoItem> {
+  async updateToDoItem(
+    userId: string,
+    params: {
+      where: Prisma.ToDoItemWhereUniqueInput;
+      data: Prisma.ToDoItemUpdateInput;
+    },
+  ): Promise<ToDoItem> {
     const { where, data } = params;
-    return this.prisma.toDoItem.update({
+
+    const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (toDoItem.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do item",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+
+    return await this.prisma.toDoItem.update({
       data,
       where,
     });
   }
 
   async deleteToDoItem(
+    userId: string,
     where: Prisma.ToDoItemWhereUniqueInput,
   ): Promise<ToDoItem> {
-    return this.prisma.toDoItem.delete({
+    const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (toDoItem.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do item",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+
+    return await this.prisma.toDoItem.delete({
       where,
     });
   }

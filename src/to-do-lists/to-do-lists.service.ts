@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { ToDoList, Prisma } from '@prisma/client';
 
@@ -7,14 +7,21 @@ export class ToDoListsService {
   constructor(private prisma: PrismaService) {}
 
   async toDoList(
-    ToDoListWhereUniqueInput: Prisma.ToDoListWhereUniqueInput,
+    userId: string,
+    where: Prisma.ToDoListWhereUniqueInput,
   ): Promise<ToDoList | null> {
-    return this.prisma.toDoList.findUnique({
-      where: ToDoListWhereUniqueInput,
+    const toDoList = await this.prisma.toDoList.findUnique({
+      where,
       include: {
         items: true,
       },
     });
+    if (toDoList.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do list",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    return toDoList;
   }
 
   async toDoLists(params: {
@@ -34,27 +41,41 @@ export class ToDoListsService {
     });
   }
 
-  async createToDoList(data: Prisma.ToDoListCreateInput): Promise<ToDoList> {
-    return this.prisma.toDoList.create({
-      data,
+  async createToDoList(
+    userId: string,
+    data: Prisma.ToDoListCreateInput,
+  ): Promise<ToDoList> {
+    return await this.prisma.toDoList.create({
+      data: { ...data, author: { connect: { id: userId } } },
     });
   }
 
-  async updateToDoList(params: {
-    where: Prisma.ToDoListWhereUniqueInput;
-    data: Prisma.ToDoListUpdateInput;
-  }): Promise<ToDoList> {
+  async updateToDoList(
+    userId: string,
+    params: {
+      where: Prisma.ToDoListWhereUniqueInput;
+      data: Prisma.ToDoListUpdateInput;
+    },
+  ): Promise<ToDoList> {
     const { where, data } = params;
-    return this.prisma.toDoList.update({
+
+    const toDoList = await this.prisma.toDoList.findUnique({ where });
+    if (toDoList.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do list",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    return await this.prisma.toDoList.update({
       data,
       where,
     });
   }
 
   async deleteToDoList(
+    userId: string,
     where: Prisma.ToDoListWhereUniqueInput,
   ): Promise<ToDoList> {
-    return this.prisma.toDoList.delete({
+    return await this.prisma.toDoList.delete({
       where,
     });
   }
