@@ -41,12 +41,9 @@ export class ToDoListsService {
     });
   }
 
-  async createToDoList(
-    userId: string,
-    data: Prisma.ToDoListCreateInput,
-  ): Promise<ToDoList> {
+  async createToDoList(data: Prisma.ToDoListCreateInput): Promise<ToDoList> {
     return await this.prisma.toDoList.create({
-      data: { ...data, author: { connect: { id: userId } } },
+      data,
     });
   }
 

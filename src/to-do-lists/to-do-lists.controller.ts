@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ToDoListsService } from './to-do-lists.service';
-import { ToDoList as ToDoListModel } from '@prisma/client';
+import { Prisma, ToDoList as ToDoListModel } from '@prisma/client';
 import { Request } from 'express';
 
 @Controller('lists')
@@ -33,11 +33,14 @@ export class ToDoListsController {
   @Post('new')
   async create(
     @Req() req: Request,
-    @Body() createToDoListDto: ToDoListModel,
+    @Body() toDoListData: { title: string },
   ): Promise<ToDoListModel> {
     const { sub: userId } = req.user;
-
-    return this.toDoListsService.createToDoList(userId, createToDoListDto);
+    const { title } = toDoListData;
+    return this.toDoListsService.createToDoList({
+      title,
+      author: { connect: { id: userId } },
+    });
   }
 
   @Delete(':id')
