@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpException,
   HttpStatus,
+  Post,
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -26,7 +27,7 @@ export class AuthController {
     return this.authService.signIn(username, password);
   }
   @Public()
-  @Get('/register')
+  @Post('/register')
   async register(
     @Body() data: { username: string; password: string; email: string },
   ) {
