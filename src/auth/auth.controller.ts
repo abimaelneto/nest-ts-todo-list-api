@@ -16,7 +16,7 @@ import { Public } from 'src/public-metadata';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Public()
-  @Get('/login')
+  @Post('/login')
   async login(
     @Body() data: { username: string; password: string },
   ): Promise<{ access_token: string }> {
