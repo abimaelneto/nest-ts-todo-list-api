@@ -14,7 +14,7 @@ datasource db {
 model User {
   id    String     @default(uuid()) @id
   username  String @unique
-  email String
+  email String @unique
   password String
   items ToDoItem[] @relation("UserItems")
   lists ToDoList[] @relation("UserLists")

@@ -12,8 +12,8 @@ export class AuthService {
     private prisma: PrismaService,
   ) {}
 
-  async signIn(username: string, password: string) {
-    const user = await this.usersService.user({ username });
+  async signIn(email: string, password: string) {
+    const user = await this.usersService.user({ email });
     if (user?.password !== password) {
       throw new UnauthorizedException("User doesn't exist");
     }

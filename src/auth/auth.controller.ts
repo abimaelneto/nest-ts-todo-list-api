@@ -18,13 +18,13 @@ export class AuthController {
   @Public()
   @Post('/login')
   async login(
-    @Body() data: { username: string; password: string },
+    @Body() data: { email: string; password: string },
   ): Promise<{ access_token: string }> {
-    const { username, password } = data;
-    if (!username || !password)
+    const { email, password } = data;
+    if (!email || !password)
       throw new HttpException('Missing fields', HttpStatus.BAD_REQUEST);
 
-    return this.authService.signIn(username, password);
+    return this.authService.signIn(email, password);
   }
   @Public()
   @Post('/register')
