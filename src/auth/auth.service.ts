@@ -1,7 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -23,6 +29,13 @@ export class AuthService {
     };
   }
   async register(data: Prisma.UserCreateInput) {
+    const { username, email } = data;
+    const user = await this.usersService.user({ username, email });
+    if (user)
+      throw new HttpException(
+        'username and email must be unique',
+        HttpStatus.BAD_REQUEST,
+      );
     return this.usersService.create(data);
   }
 }
