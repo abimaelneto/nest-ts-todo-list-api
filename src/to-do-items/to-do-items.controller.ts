@@ -40,7 +40,7 @@ export class ToDoItemsController {
   async createToDoItem(
     @Req() req: Request,
     @Body() toDoItemData: { title: string; deadline: string; listId: string },
-  ): Promise<ToDoItemModel> {
+  ): Promise<ToDoItemModel | undefined> {
     const userId = req?.user?.sub;
     if (!userId)
       throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
