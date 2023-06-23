@@ -32,7 +32,7 @@ model ToDoList {
 model ToDoItem {
   id        String      @default(uuid()) @id
   title     String
-  deadline DateTime
+  deadline DateTime? 
   done Boolean? @default(false)
   list    ToDoList    @relation("ListItems",fields: [listId], references: [id])
   listId  String
