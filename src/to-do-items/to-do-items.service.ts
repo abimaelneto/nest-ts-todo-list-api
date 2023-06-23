@@ -11,6 +11,8 @@ export class ToDoItemsService {
     where: Prisma.ToDoItemWhereUniqueInput,
   ): Promise<ToDoItem | null> {
     const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (!toDoItem)
+      throw new HttpException("Item doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoItem.authorId != userId)
       throw new HttpException(
         "User doesn't own this to do item",
@@ -36,7 +38,9 @@ export class ToDoItemsService {
     });
   }
 
-  async createToDoItem(data: Prisma.ToDoItemCreateInput): Promise<ToDoItem> {
+  async createToDoItem(
+    data: Prisma.ToDoItemCreateInput,
+  ): Promise<ToDoItem | undefined> {
     try {
       return await this.prisma.toDoItem.create({
         data,
@@ -48,6 +52,7 @@ export class ToDoItemsService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
+      return;
     }
   }
 
@@ -61,6 +66,8 @@ export class ToDoItemsService {
     const { where, data } = params;
 
     const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (!toDoItem)
+      throw new HttpException("Item doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoItem.authorId != userId)
       throw new HttpException(
         "User doesn't own this to do item",
@@ -78,6 +85,8 @@ export class ToDoItemsService {
     where: Prisma.ToDoItemWhereUniqueInput,
   ): Promise<ToDoItem> {
     const toDoItem = await this.prisma.toDoItem.findUnique({ where });
+    if (!toDoItem)
+      throw new HttpException("Item doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoItem.authorId != userId)
       throw new HttpException(
         "User doesn't own this to do item",

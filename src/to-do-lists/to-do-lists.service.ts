@@ -16,6 +16,8 @@ export class ToDoListsService {
         items: true,
       },
     });
+    if (!toDoList)
+      throw new HttpException("List doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoList.authorId != userId)
       throw new HttpException(
         "User doesn't own this to do list",
@@ -57,6 +59,8 @@ export class ToDoListsService {
     const { where, data } = params;
 
     const toDoList = await this.prisma.toDoList.findUnique({ where });
+    if (!toDoList)
+      throw new HttpException("List doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoList.authorId != userId)
       throw new HttpException(
         "User doesn't own this to do list",
@@ -72,6 +76,14 @@ export class ToDoListsService {
     userId: string,
     where: Prisma.ToDoListWhereUniqueInput,
   ): Promise<ToDoList> {
+    const toDoList = await this.prisma.toDoList.findUnique({ where });
+    if (!toDoList)
+      throw new HttpException("Item doesn't exist", HttpStatus.BAD_REQUEST);
+    if (toDoList.authorId != userId)
+      throw new HttpException(
+        "User doesn't own this to do item",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     return await this.prisma.toDoList.delete({
       where,
     });

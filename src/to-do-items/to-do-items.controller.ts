@@ -19,7 +19,9 @@ export class ToDoItemsController {
   constructor(private readonly toDoItemsService: ToDoItemsService) {}
   @Get()
   async getItems(@Req() req: Request): Promise<ToDoItemModel[]> {
-    const { sub: userId } = req.user;
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoItemsService.toDoItems({ where: { authorId: userId } });
   }
 
@@ -27,9 +29,10 @@ export class ToDoItemsController {
   async getItem(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<ToDoItemModel> {
-    const { sub: userId } = req.user;
-
+  ): Promise<ToDoItemModel | null> {
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoItemsService.toDoItem(userId, { id });
   }
 
@@ -38,7 +41,9 @@ export class ToDoItemsController {
     @Req() req: Request,
     @Body() toDoItemData: { title: string; deadline: string; listId: string },
   ): Promise<ToDoItemModel> {
-    const { sub: userId } = req.user;
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     const { title, deadline, listId } = toDoItemData;
 
     if (!listId)
@@ -57,20 +62,21 @@ export class ToDoItemsController {
     @Req() req: Request,
     @Param('id') id: string,
   ): Promise<ToDoItemModel> {
-    const { sub: userId } = req.user;
-
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoItemsService.deleteToDoItem(userId, { id });
   }
 
   @Patch(':id')
   async update(
     @Req() req: Request,
-
     @Param('id') id: string,
     @Body() toDoItemData: { deadline: string; listId: string; done: boolean },
   ): Promise<ToDoItemModel> {
-    const { sub: userId } = req.user;
-
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoItemsService.updateToDoItem(userId, {
       where: { id },
       data: toDoItemData,

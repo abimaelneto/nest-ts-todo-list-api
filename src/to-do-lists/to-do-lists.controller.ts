@@ -3,7 +3,10 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
+  Patch,
   Post,
   Req,
 } from '@nestjs/common';
@@ -16,8 +19,9 @@ export class ToDoListsController {
   constructor(private readonly toDoListsService: ToDoListsService) {}
   @Get()
   async getLists(@Req() req: Request): Promise<ToDoListModel[]> {
-    const { sub: userId } = req.user;
-
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoListsService.toDoLists({ where: { authorId: userId } });
   }
 
@@ -25,8 +29,10 @@ export class ToDoListsController {
   async getListById(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<ToDoListModel> {
-    const { sub: userId } = req.user;
+  ): Promise<ToDoListModel | null> {
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoListsService.toDoList(userId, { id: id });
   }
 
@@ -35,7 +41,7 @@ export class ToDoListsController {
     @Req() req: Request,
     @Body() toDoListData: { title: string },
   ): Promise<ToDoListModel> {
-    const { sub: userId } = req.user;
+    const { sub: userId } = req.user || {};
     const { title } = toDoListData;
     return this.toDoListsService.createToDoList({
       title,
@@ -43,13 +49,28 @@ export class ToDoListsController {
     });
   }
 
+  @Patch(':id')
+  async updateList(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Body() toDoListData: { title: string },
+  ): Promise<ToDoListModel> {
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
+    return this.toDoListsService.updateToDoList(userId, {
+      where: { id },
+      data: toDoListData,
+    });
+  }
   @Delete(':id')
   async deletePost(
     @Req() req: Request,
     @Param('id') id: string,
   ): Promise<ToDoListModel> {
-    const { sub: userId } = req.user;
-
+    const userId = req?.user?.sub;
+    if (!userId)
+      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
     return this.toDoListsService.deleteToDoList(userId, { id });
   }
 }
