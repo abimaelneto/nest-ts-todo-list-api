@@ -75,17 +75,18 @@ export class ToDoListsService {
   async deleteToDoList(
     userId: string,
     where: Prisma.ToDoListWhereUniqueInput,
-  ): Promise<ToDoList> {
+  ): Promise<{ id: string }> {
     const toDoList = await this.prisma.toDoList.findUnique({ where });
     if (!toDoList)
-      throw new HttpException("Item doesn't exist", HttpStatus.BAD_REQUEST);
+      throw new HttpException("List doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoList.authorId != userId)
       throw new HttpException(
-        "User doesn't own this to do item",
+        "User doesn't own this to do list",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    return await this.prisma.toDoList.delete({
+    const { id } = await this.prisma.toDoList.delete({
       where,
     });
+    return { id };
   }
 }
