@@ -67,7 +67,7 @@ export class ToDoListsController {
   async deletePost(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<ToDoListModel> {
+  ): Promise<{ id: string } | undefined> {
     const userId = req?.user?.sub;
     if (!userId)
       throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
