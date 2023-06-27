@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ToDoListsService } from './to-do-lists.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { db } from '../../test/utils/prisma/to-do-lists';
+import { db } from '../../test/utils/prisma';
 
 describe('ToDoListsService', () => {
   let service: ToDoListsService;

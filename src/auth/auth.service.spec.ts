@@ -1,29 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { Prisma, User } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { db } from '../../test/utils/prisma';
+import { UsersService } from '../users/users.service';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
-const db = {
-  user: {
-    findMany: jest.fn().mockResolvedValue([]),
-    findUnique: jest.fn().mockResolvedValue({}),
-    update: jest.fn().mockResolvedValue({}),
-    create: jest
-      .fn()
-      .mockImplementation(({ data }: { data: Prisma.UserCreateInput }) => {
-        return { ...data, id: '1' } as User;
-      }),
-    delete: jest.fn().mockResolvedValue({}),
-  },
-};
-
-describe.skip('AuthService', () => {
+describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      imports: [
+        JwtModule.register({
+          global: true,
+          secret: jwtConstants.secret,
+          signOptions: { expiresIn: '60d' },
+        }),
+      ],
+      providers: [
+        AuthService,
+        UsersService,
+        {
+          provide: PrismaService,
+          useValue: db,
+        },
+      ],
     }).compile();
-
     service = module.get<AuthService>(AuthService);
   });
 
