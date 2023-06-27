@@ -77,7 +77,6 @@ export class ToDoListsService {
     where: Prisma.ToDoListWhereUniqueInput,
   ): Promise<{ id: string }> {
     const toDoList = await this.prisma.toDoList.findUnique({ where });
-    console.log(toDoList);
     if (!toDoList)
       throw new HttpException("List doesn't exist", HttpStatus.BAD_REQUEST);
     if (toDoList.authorId != userId)
