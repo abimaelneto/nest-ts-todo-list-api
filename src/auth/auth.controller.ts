@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Prisma, User } from '@prisma/client';
-import { Public } from 'src/public-metadata';
+import { Public } from '../public-metadata';
 
 @Controller('auth')
 export class AuthController {
