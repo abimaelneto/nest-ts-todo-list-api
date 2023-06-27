@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 
 import { INestApplication } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { db } from './utils/prisma/to-do-lists';
+import { db } from './utils/prisma';
 import { ToDoListsModule } from '../src/to-do-lists/to-do-lists.module';
 import { AuthModule } from '../src/auth/auth.module';
 
