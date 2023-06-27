@@ -3,24 +3,11 @@ import { UsersService } from './users.service';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
+import { db } from '../../test/utils/prisma';
 
 describe('UsersService', () => {
   let service: UsersService;
   let prisma: PrismaService;
-
-  const db = {
-    user: {
-      findMany: jest.fn().mockResolvedValue([]),
-      findUnique: jest.fn().mockResolvedValue({}),
-      update: jest.fn().mockResolvedValue({}),
-      create: jest
-        .fn()
-        .mockImplementation(({ data }: { data: Prisma.UserCreateInput }) => {
-          return { ...data, id: '1' } as User;
-        }),
-      delete: jest.fn().mockResolvedValue({}),
-    },
-  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +27,7 @@ describe('UsersService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-  it.only('should create new user ', async () => {
+  it('should create new user ', async () => {
     const user = {
       username: 'Rich',
       email: 'hello@prisma.io',
