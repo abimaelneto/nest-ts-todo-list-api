@@ -22,6 +22,6 @@ phases:
 artifacts:
   files:
     - Procfile
-    - dist/*
+    - dist/**/*
     - package.json
     - node_modules/**/*
