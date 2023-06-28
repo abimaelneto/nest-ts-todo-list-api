@@ -25,3 +25,4 @@ artifacts:
     - dist/**/*
     - package.json
     - node_modules/**/*
+    - src/prisma/*
