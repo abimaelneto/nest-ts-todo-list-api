@@ -7,10 +7,15 @@ orbs:
   node: circleci/node@4.7
 jobs:
   test:
-    executor: node/default
+    executor: 
+      name: node/default
+      tag: '16'
     steps:
       - checkout
-      - node/install-packages
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install 
+      - run: npm run types
       - run: npm run test
 
 # Invoke jobs via workflows
