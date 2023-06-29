@@ -11,6 +11,11 @@ jobs:
     docker:
       - image: cimg/node:current
     steps:
+      - checkout
+      - node/install-npm
+      - run:
+          name: Types
+          command: npm run types
       - run:
           name: Types
           command: npm run types
