@@ -5,29 +5,16 @@ version: 2.1
 # See: https://circleci.com/docs/orb-intro/
 orbs:
   node: circleci/node@4.7
-
 jobs:
-  pipeline:
-    docker:
-      - image: cimg/node:current
+  test:
+    executor: node/default
     steps:
       - checkout
-      - node/install-npm
-       # Install dependencies - the node Orb take care of installation and dependency caching
+      - run: sudo npm install -g npm@latest
       - node/install-packages:
-          app-dir: ~/mern-starter
-          cache-path: node_modules
-          override-ci-command: npm i
-      
-      - run:
-          name: Types
-          command: echo "test"
-      - run:
-          name: Types
-          command: npm run types
-      - run:
-          name: Test
-          command: npm run test
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run test
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -35,6 +22,6 @@ workflows:
   sample: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     jobs:
-      - pipeline
+      - test
       
      
