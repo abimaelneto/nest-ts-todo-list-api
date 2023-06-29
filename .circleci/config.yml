@@ -18,15 +18,16 @@ jobs:
           app-dir: ~/mern-starter
           cache-path: node_modules
           override-ci-command: npm i
+      
       - run:
           name: Types
-          command: npm run types
+          command: echo "test"
       - run:
           name: Types
           command: npm run types
       - run:
           name: Test
-          command: npm test
+          command: npm run test
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
