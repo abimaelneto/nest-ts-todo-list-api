@@ -7,13 +7,11 @@ orbs:
   node: circleci/node@4.7
 jobs:
   test:
-    executor: 
-      name: node/default
-      tag: '16'
+    executor: node/default # use the default executor defined within the orb
     steps:
       - checkout
       - node/install-packages:
-          cache-path: ~/project/node_modules
+          pkg-manager: npm
           override-ci-command: npm install 
       - run: npm run types
       - run: npm run test
