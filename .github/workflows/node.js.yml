@@ -31,5 +31,5 @@ jobs:
           application_name: to-do-list-api
           environment_name: To-do-list-api-dev-env-node-16
           version_label: 12345
-          region: us-west-2
+          region: us-east-2
           deployment_package: deploy.zip
