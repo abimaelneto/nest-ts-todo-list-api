@@ -19,7 +19,7 @@ jobs:
       - run: npm install
       - run: npm run types
       - run: npm run test
-
+      - run: npm run build
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
