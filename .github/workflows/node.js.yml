@@ -30,13 +30,12 @@ jobs:
           format: 'YYYY-MM-DD-HH-mm-ss'
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
-        env:
-          TIME: "${{ steps.time.outputs.time }}"
+
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: to-do-list-api
           environment_name: To-do-list-api-dev-env-node-16
-          version_label: ${{TIME}}
+          version_label: ${{ steps.time.outputs.time }}
           region: us-east-2
           deployment_package: deploy.zip
