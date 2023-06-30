@@ -29,8 +29,8 @@ export class AuthService {
     };
   }
   async register(data: Prisma.UserCreateInput) {
-    const { username, email } = data;
-    const user = await this.usersService.user({ username, email });
+    const { email } = data;
+    const user = await this.usersService.user({ email });
     if (user)
       throw new HttpException(
         'username and email must be unique',

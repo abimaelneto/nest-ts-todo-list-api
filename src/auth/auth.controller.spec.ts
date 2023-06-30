@@ -33,4 +33,18 @@ describe('AuthController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+  it('should be able to register', () => {
+    const spy = jest.spyOn(controller, 'register');
+    const newUser = {
+      username: 'username',
+      email: 'mail@mail.com',
+      password: 'pass',
+    };
+
+    expect(controller.register(newUser)).resolves.toMatchObject({
+      ...newUser,
+      id: '1',
+    });
+    expect(spy).toHaveBeenCalledWith(newUser);
+  });
 });
