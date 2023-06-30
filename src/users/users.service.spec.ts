@@ -2,12 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, User } from '@prisma/client';
 import { db } from '../../test/utils/prisma';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,7 +17,6 @@ describe('UsersService', () => {
         },
       ],
     }).compile();
-    prisma = module.get<PrismaService>(PrismaService);
 
     service = module.get<UsersService>(UsersService);
   });
@@ -35,6 +32,17 @@ describe('UsersService', () => {
     };
 
     await expect(service.create(user)).resolves.toMatchObject({
+      ...user,
+      id: '1',
+    });
+  });
+  it('should get user ', async () => {
+    const user = {
+      username: 'Rich',
+      email: 'hello@prisma.io',
+    };
+
+    await expect(service.user(user)).resolves.toMatchObject({
       ...user,
       id: '1',
     });

@@ -55,4 +55,11 @@ describe('To Do Lists', () => {
       .expect(200)
       .expect({ ...newUser, id: '1' });
   });
+  it(`Creates a user`, async () => {
+    await request(app.getHttpServer())
+      .post('/auth/register')
+      .send(newUser)
+      .expect(201)
+      .expect({ ...newUser, id: '1' });
+  });
 });
