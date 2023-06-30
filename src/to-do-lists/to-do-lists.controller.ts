@@ -11,7 +11,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { ToDoListsService } from './to-do-lists.service';
-import { Prisma, ToDoList as ToDoListModel } from '@prisma/client';
+import { ToDoList as ToDoListModel } from '@prisma/client';
 import { Request } from 'express';
 
 @Controller('lists')
@@ -21,7 +21,10 @@ export class ToDoListsController {
   async getLists(@Req() req: Request): Promise<ToDoListModel[]> {
     const userId = req?.user?.sub;
     if (!userId)
-      throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'No credentials provided',
+        HttpStatus.UNAUTHORIZED,
+      );
     return this.toDoListsService.toDoLists({ where: { authorId: userId } });
   }
 
@@ -43,6 +46,8 @@ export class ToDoListsController {
   ): Promise<ToDoListModel> {
     const { sub: userId } = req.user || {};
     const { title } = toDoListData;
+    if (!title)
+      throw new HttpException('Missing fields', HttpStatus.BAD_REQUEST);
     return this.toDoListsService.createToDoList({
       title,
       author: { connect: { id: userId } },
@@ -67,7 +72,7 @@ export class ToDoListsController {
   async deletePost(
     @Req() req: Request,
     @Param('id') id: string,
-  ): Promise<ToDoListModel> {
+  ): Promise<{ id: string } | undefined> {
     const userId = req?.user?.sub;
     if (!userId)
       throw new HttpException('Missing user id', HttpStatus.BAD_REQUEST);
